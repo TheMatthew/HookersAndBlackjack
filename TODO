@@ -1,0 +1,33 @@
+- Add GPL headers
+
+- Stabilize bank
+
+- Add crc on bank file. Human readable but we still need to work to hack it. 
+
+- Add !Help option for Hooker and Blackjack
+
+- Bet should be remembered for next deal
+ 
+- Better hand state checks
+ 
+- Short commands !b bet !d deal !h hit !s stand !d doubledown !p split (not sure)
+ 
+- show cards in short form not words (e.g. [5s Kd 10h Ac] (not sure)
+ 
+- show card total after first two cards and every card. show soft total e.g. 4/14
+(hint: if you count all aces as 1 and the total is <= 11, then show both soft/hard totals) (not sure)
+ 
+- you could show the options to the player after each card (ie. !h !s [!d] [!p] if applicable)
+ 
+- dealer stands on soft 17
+ 
+- automatic stand on player 21 (soft or hard)
+ 
+- show money balance on every hand outcome
+ 
+- double down is only on first 2 cards, it makes a hit and no possibility of getting a 4th card
+ 
+- split if first 2 cards are equal (technically can split on mix of 10/J/Q/K but not recommended...)
+you then play two hands one after the other, each get a new 2nd card and you can double down again
+ 
+- if not too hard to code it, you can split again if you get the same card again
