@@ -1,16 +1,19 @@
+/**
+ * 
+ */
 package com.matthew.hookersandblackjack;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Properties;
 
 public class HMDB {
 
-	private java.io.File dbFile;
+	private Properties prop;
+	private File dbFile;
 
 	public HMDB(String fileName) throws IOException {
 		super();
@@ -19,22 +22,21 @@ public class HMDB {
 			dbFile.createNewFile();
 	}
 
-	public Long get(String key) {
-		java.io.BufferedReader reader;
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	synchronized public Long get(String key) {
+		Long ret = null;
+		FileReader reader;
 		try {
-			reader = new BufferedReader(new FileReader(dbFile));
-			String nextLine = reader.readLine();
-			while (nextLine != null) {
-				String tokens[] = nextLine.split(" ");
-                if( tokens.legth == 2 ){
-    				String oldKey = tokens[0];
-    				Long money = Long.parseLong(tokens[1]);
-    				if (oldKey.equals(key)) {
-    					reader.close();
-    					return money;
-    				}
-                }
-				nextLine = reader.readLine();
+			reader = new FileReader(dbFile);
+			prop.load(reader);
+			ret = (Long) prop.get(key);
+			if (ret == null) {
+				prop.put(key, 50L);
+				ret = (Long) prop.get(key);
 			}
 			reader.close();
 		} catch (FileNotFoundException e) {
@@ -44,41 +46,26 @@ public class HMDB {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		put(key, 50L);
-		return 50L;
+		return ret;
 	}
 
-	public Long put(String key, Long value) {
-		String oldFile = "";
-		java.io.BufferedReader reader;
-		java.io.BufferedWriter writer;
+	/**
+	 * 
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	synchronized public Long put(String key, Long value) {
+		FileReader reader;
+		FileWriter writer;
 		try {
-			reader = new BufferedReader(new FileReader(dbFile));
-			boolean found = false;
-			String nextLine = reader.readLine();
-			while (nextLine != null && !nextLine.isEmpty()) {
-				String tokens[] = nextLine.split(" ");
-				if (tokens.length == 2) {
+			reader = new FileReader(dbFile);
+			prop.load(reader);
+			reader.close();
+			prop.put(key, value);
+			writer = new FileWriter(dbFile);
+			prop.store(writer, key + " new value " + value.toString());
 
-					String oldKey = tokens[0];
-					Long money = Long.parseLong(tokens[1]);
-					if (oldKey.equals(key)) {
-						found = true;
-						oldFile += key + " " + value.toString() + "\n";
-					} else
-						oldFile += key + " " + money.toString() + "\n";
-					nextLine = reader.readLine();
-				}else{
-					System.out.println( "Error in db, please contact your admin.");
-				}
-				if (!found)
-					oldFile += key + " " + value.toString() + "\n";
-				reader.close();
-				writer = new BufferedWriter(new FileWriter(dbFile));
-				writer.write(oldFile);
-				writer.close();
-			}
-			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
