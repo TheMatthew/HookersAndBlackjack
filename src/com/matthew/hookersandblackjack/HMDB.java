@@ -26,12 +26,14 @@ public class HMDB {
 			String nextLine = reader.readLine();
 			while (nextLine != null) {
 				String tokens[] = nextLine.split(" ");
-				String oldKey = tokens[0];
-				Long money = Long.parseLong(tokens[1]);
-				if (oldKey.equals(key)) {
-					reader.close();
-					return money;
-				}
+                if( tokens.legth == 2 ){
+    				String oldKey = tokens[0];
+    				Long money = Long.parseLong(tokens[1]);
+    				if (oldKey.equals(key)) {
+    					reader.close();
+    					return money;
+    				}
+                }
 				nextLine = reader.readLine();
 			}
 			reader.close();
