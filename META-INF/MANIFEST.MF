@@ -1,0 +1,6 @@
+Bundle-SymbolicName: HookersAndBlackJack
+Bundle-version: 1.0
+Export-Package: com.matthew.hookersandblackjack,
+ org.jibble.pircbot
+Bundle-Name: Hookers and BlackJack
+Bundle-Vendor: none
