@@ -20,8 +20,11 @@
 
 package com.matthew.hookersandblackjack;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.Set;
 
 import org.jibble.pircbot.DccChat;
 import org.jibble.pircbot.DccFileTransfer;
@@ -36,7 +39,7 @@ public class HookerBot extends PircBot {
 	class LastAction {
 		public LastAction(String action) {
 			name = action;
-			cost = name.hashCode() % 80 + 20;
+			cost = ((name.hashCode() % 80)+80)%80 + 20;
 		}
 
 		public int getPrice() {
@@ -78,32 +81,81 @@ public class HookerBot extends PircBot {
 	protected void onMessage(String channel, String sender, String login,
 			String hostname, String message) {
 		super.onMessage(channel, sender, login, hostname, message);
-		if (message.toLowerCase().startsWith("!price")) {
-			String action = message.substring(6);
-			LastAction la = new LastAction(action);
-			custList.put(sender, la);
-			sendMessage(channel, sender + ": That will cost " + la.getPrice()
-					+ " Lttng dollars");
-		} else if (message.toLowerCase().startsWith("!accept")) {
+		if (message.toLowerCase().startsWith("!price"))
+			price(channel, sender, message);
+		else if (message.toLowerCase().startsWith("!accept"))
+			accept(channel, sender);
+		else if (message.toLowerCase().startsWith("!hotness"))
+			hotness(channel, sender);
+	}
+
+	class Pair implements Comparable<Pair> {
+		long val;
+		String key;
+
+		@Override
+		public int compareTo(Pair arg0) {
+			if (arg0.val > val)
+				return -1;
+			if (arg0.val < val)
+				return 1;
+			return 0;
+		}
+
+	}
+
+	private void hotness(String channel, String sender) {
+		Set<String> keys = playerDB.Keys();
+		ArrayList<Pair> al = new ArrayList<Pair>();
+		for( String s : keys){
+			Pair p = new Pair();
+			p.key = s; 
+			p.val = playerDB.get(s);
+			al.add(p);
+		}
+		Collections.sort(al);
+		String players = "I find ";
+		final int arrSize = Math.min(10, al.size());
+		for(int i= 0 ; i < arrSize; i++){
+		players += (char)2;
+		players += al.get(i).key;
+		players += (char)2;
+		if( i < arrSize-2)
+		players += ", ";
+		else if( i == arrSize-2)
+			players += " and ";
+		}
+		players+= " hot.";
+		sendMessage( channel, sender+ ": " + players);}
+
+	private void accept(String channel, String sender) {
+		{
 			LastAction lastAction = custList.get(sender);
 			if (lastAction != null) {
 				Long currentCash = playerDB.get(sender);
 				if (currentCash > lastAction.getPrice()) {
 					sendMessage(channel, sender + ": Ok");
-					sendAction(channel, " does " + lastAction.name
-							+ " to " + sender);
-					playerDB.put(sender,
-							currentCash
-									- lastAction.getPrice());
+					sendAction(channel, " does " + lastAction.name + " to "
+							+ sender);
+					playerDB.put(sender, currentCash - lastAction.getPrice());
 				} else {
 					sendMessage(channel, "Hey everyone, " + sender
-							+ " can't even afford a "
-							+ lastAction.name + "!");
+							+ " can't even afford a " + lastAction.name + "!");
 				}
 			} else {
 				sendMessage(channel, sender
 						+ ": You haven't told me what you want to do");
 			}
+		}
+	}
+
+	private void price(String channel, String sender, String message) {
+		{
+			String action = message.substring(6);
+			LastAction la = new LastAction(action);
+			custList.put(sender, la);
+			sendMessage(channel, sender + ": That will cost " + la.getPrice()
+					+ " Lttng dollars");
 		}
 	}
 

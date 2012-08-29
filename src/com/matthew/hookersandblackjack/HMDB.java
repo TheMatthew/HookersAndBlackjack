@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
+import java.util.Set;
 
 public class HMDB {
 
@@ -34,6 +35,20 @@ public class HMDB {
 	private HashMap<String, Long> prop;
 	private File dbFile;
 
+	@SuppressWarnings("unchecked")
+	public Set<String> Keys(){
+		FileInputStream reader;
+		try {
+			reader = new FileInputStream(dbFile);
+			ObjectInputStream ois = new ObjectInputStream(reader);
+			prop = (HashMap<String, Long>) ois.readObject();}
+		catch(Exception e){
+			
+		}
+		
+		return prop.keySet();
+	}
+	
 	public HMDB(String fileName) throws IOException {
 		super();
 		dbFile = new File(fileName);
