@@ -155,7 +155,6 @@ public class BlackJackBot extends PircBot {
 		}
 	}
 
-	
 	@Override
 	protected void onMessage(String channel, String sender, String login,
 			String hostname, String message) {
@@ -182,9 +181,14 @@ public class BlackJackBot extends PircBot {
 	}
 
 	private void help(String sender) {
-		sendMessage(
-				sender,
-				"Type !play to play, !bet <amount> to bet, !deal to deal, !double to double down, !stand to stand and !balance to know how much cash you have");
+		sendMessage(sender, "Type " + 
+				(char) 2 + "!help" + (char) 2 + " to display this message, " + 
+				(char) 2 + "!play" + (char) 2 + " to play, " + 
+				(char) 2 + "!bet <amount>" + (char) 2 + " to bet, " + 
+				(char) 2 + "!deal" + (char) 2 + " to deal, " +
+				(char) 2 + "!double" + (char) 2 + " to double down, " +
+				(char) 2 + "!stand" + (char) 2 + " to stand and " + 
+				(char) 2 + "!balance" + (char) 2 + " to know how much cash you have");
 	}
 
 	private void playStart(String sender, final Player player) {
@@ -249,7 +253,8 @@ public class BlackJackBot extends PircBot {
 	}
 
 	private boolean canHitOrStand(Player player) {
-		return player.stat.equals(status.dealt)||player.stat.equals(status.hit);
+		return player.stat.equals(status.dealt)
+				|| player.stat.equals(status.hit);
 	}
 
 	public void reply(String sender, String message) {
