@@ -48,8 +48,7 @@ public class HookerBot extends PircBot {
 	}
 
 	public HookerBot() {
-	//	this.setName("HookerBot_" + names[rnd.nextInt(names.length)]);
-		this.setName("HookerBot_TEST"+(System.nanoTime()%1000));
+		this.setName("HookerBot_" + names[rnd.nextInt(names.length)]);
 	}
 
 	@Override
