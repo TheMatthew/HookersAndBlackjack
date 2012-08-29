@@ -176,6 +176,7 @@ public class BlackJackBot extends PircBot {
 			Long cash = playerDB.get(sender);
 			cash -= val;
 			playerDB.put(sender, cash - val);
+			this.hit(sender, player);
 			this.stand(sender, player);
 		}
 	}
@@ -216,7 +217,6 @@ public class BlackJackBot extends PircBot {
 	private void stand(String sender, Player player) {
 		{
 			if (canHitOrStand(player)) {
-				int playerVal = player.playerHand.getValue();
 				int dealerValue = player.dealerHand.getValue();
 				reply(sender, "Dealer has " + player.dealerHand);
 				while (dealerValue <= 17) {

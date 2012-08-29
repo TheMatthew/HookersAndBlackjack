@@ -19,13 +19,13 @@
  
 - you could show the options to the player after each card (ie. !h !s [!d] [!p] if applicable)
  
-- dealer stands on soft 17
+(done, may change)- dealer stands on soft 17
  
 - automatic stand on player 21 (soft or hard)
  
-- show money balance on every hand outcome
+(cleaned up) - show money balance on every hand outcome
  
-- double down is only on first 2 cards, it makes a hit and no possibility of getting a 4th card
+(done?) - double down is only on first 2 cards, it makes a hit and no possibility of getting a 4th card
  
 - split if first 2 cards are equal (technically can split on mix of 10/J/Q/K but not recommended...)
 you then play two hands one after the other, each get a new 2nd card and you can double down again
