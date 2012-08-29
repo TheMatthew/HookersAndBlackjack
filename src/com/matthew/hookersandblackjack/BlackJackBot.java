@@ -43,7 +43,7 @@ public class BlackJackBot extends PircBot {
 	Random rnd = new Random(System.nanoTime());
 
 	public BlackJackBot() {
-		this.setName("BlackJackBot-TEST" + (System.nanoTime() % 1000));
+		this.setName("BlackJackBot");
 	}
 
 	private void mainGame(String sender, String message) {
