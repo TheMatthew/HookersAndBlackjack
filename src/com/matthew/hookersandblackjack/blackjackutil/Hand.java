@@ -40,8 +40,9 @@ public class Hand {
 			if (c.value == 11) {
 				value++;
 				hasAce = true;
+			} else {
+				value += c.value;
 			}
-			value += c.value;
 		}
 		if (hasAce && value <= 11) {
 			value += 10;

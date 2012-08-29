@@ -52,7 +52,7 @@ public class Player {
 
 	public void reset() {
 		stat = status.notStarted;
-		bet.setValue(0);
+		bet= new Currency(0L);
 	}
 
 };
