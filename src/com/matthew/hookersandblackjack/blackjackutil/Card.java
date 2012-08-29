@@ -19,7 +19,6 @@
  */
 package com.matthew.hookersandblackjack.blackjackutil;
 
-
 public class Card implements Comparable<Card> {
 	final static String suites[] = { "Hearts", "Spades", "Clubs", "Diamonds" };
 
@@ -57,6 +56,9 @@ public class Card implements Comparable<Card> {
 
 	@Override
 	public String toString() {
+		if (suite.equals(suites[0]) || suite.equals(suites[3])) {
+			return "" + (char) 3 + "4" + numbers[number] + " of " + suite + (char) 3 + "1";
+		}
 		return numbers[number] + " of " + suite;
 	}
 }
