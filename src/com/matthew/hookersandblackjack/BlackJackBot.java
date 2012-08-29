@@ -92,6 +92,7 @@ public class BlackJackBot extends PircBot {
 					playerDB.put(sender, money - bet);
 					player.bet = new Currency(bet);
 					player.stat = status.bet;
+					reply(sender, "You've just bet "+player.bet.toString());
 				} else {
 					reply(sender, "You don't have that kind of money");
 				}
