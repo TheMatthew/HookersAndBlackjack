@@ -1,5 +1,5 @@
 /*
- * IrcRunnable.java - The IRC thread
+ * Deck.java
  *
  * Copyright (C) 2012 Matthew Khouzam
  * 
@@ -17,55 +17,35 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+package com.matthew.hookersandblackjack.blackjackutil;
 
-package com.matthew.hookersandblackjack;
+import java.util.ArrayList;
+import java.util.Collections;
 
-import org.jibble.pircbot.PircBot;
+public class Deck {
+	ArrayList<Card> cards = new ArrayList<Card>();
 
-public class IrcRunnable implements Runnable {
-
-	PircBot bot;
-
-	public PircBot getBot() {
-		return bot;
+	public Deck() {
+		for (int j = 0; j < 5; j++)
+			addDeck();
 	}
 
-	public void setBot(PircBot bot) {
-		this.bot = bot;
-	}
-
-
-	String channel = "#dorsal-test";
-
-	public String getChannel() {
-		return channel;
-	}
-
-	public void setChannel(String channel) {
-		this.channel = channel;
-	}
-	
-
-	String hostname = "irc.oftc.net";
-	
-
-	public String getHostname() {
-		return hostname;
-	}
-
-	public void setHostname(String hostname) {
-		this.hostname = hostname;
-	}
-
-	@Override
-	public void run() {
-		bot.setVerbose(true);
-		try {
-			bot.connect(hostname);
-			bot.joinChannel(channel);
-		} catch (Exception e) {
-			e.printStackTrace();
+	public void addDeck() {
+		for (int i = 0; i < 52; i++) {
+			cards.add(new Card(i));
 		}
+		Collections.shuffle(cards);
 	}
 
+	public Card Deal() {
+		Card ret = cards.remove(cards.size() - 1);
+		if (remain() < 52 * 2) {
+			addDeck();
+		}
+		return ret;
+	}
+
+	public int remain() {
+		return cards.size();
+	}
 }

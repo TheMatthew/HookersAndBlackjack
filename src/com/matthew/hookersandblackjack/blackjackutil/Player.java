@@ -1,5 +1,5 @@
 /*
- * IrcRunnable.java - The IRC thread
+ * Player.java
  *
  * Copyright (C) 2012 Matthew Khouzam
  * 
@@ -17,55 +17,40 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+package com.matthew.hookersandblackjack.blackjackutil;
 
-package com.matthew.hookersandblackjack;
+public class Player {
 
-import org.jibble.pircbot.PircBot;
-
-public class IrcRunnable implements Runnable {
-
-	PircBot bot;
-
-	public PircBot getBot() {
-		return bot;
+	public enum status {
+		notStarted, started, bet, dealt, stand
 	}
 
-	public void setBot(PircBot bot) {
-		this.bot = bot;
+	public status stat;
+
+	public long bet;
+
+	public Hand dealerHand;
+	public status getStat() {
+		return stat;
 	}
 
-
-	String channel = "#dorsal-test";
-
-	public String getChannel() {
-		return channel;
+	public Hand getDealerHand() {
+		return dealerHand;
 	}
 
-	public void setChannel(String channel) {
-		this.channel = channel;
-	}
-	
-
-	String hostname = "irc.oftc.net";
-	
-
-	public String getHostname() {
-		return hostname;
+	public Hand getPlayerHand() {
+		return playerHand;
 	}
 
-	public void setHostname(String hostname) {
-		this.hostname = hostname;
+	public Hand playerHand;
+
+	public Player() {
+		reset();
 	}
 
-	@Override
-	public void run() {
-		bot.setVerbose(true);
-		try {
-			bot.connect(hostname);
-			bot.joinChannel(channel);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public void reset() {
+		stat = status.notStarted;
+		bet = 0;
 	}
 
-}
+};

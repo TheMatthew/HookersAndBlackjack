@@ -1,5 +1,5 @@
 /*
- * IrcRunnable.java - The IRC thread
+ * Hand.java
  *
  * Copyright (C) 2012 Matthew Khouzam
  * 
@@ -17,55 +17,48 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+package com.matthew.hookersandblackjack.blackjackutil;
 
-package com.matthew.hookersandblackjack;
+import java.util.ArrayList;
+import java.util.Collections;
 
-import org.jibble.pircbot.PircBot;
+public class Hand {
+	ArrayList<Card> cards = new ArrayList<Card>();
 
-public class IrcRunnable implements Runnable {
+	public int getValue() {
+		int value = 0;
+		for (Card c : cards) {
+			if (value + 11 > 21 && c.value == 11)
+				value++;
+			else
+				value += c.value;
 
-	PircBot bot;
-
-	public PircBot getBot() {
-		return bot;
+		}
+		return value;
 	}
 
-	public void setBot(PircBot bot) {
-		this.bot = bot;
+	public void hit(Card c) {
+		cards.add(c);
+		Collections.sort(cards);
+
 	}
 
-
-	String channel = "#dorsal-test";
-
-	public String getChannel() {
-		return channel;
+	public boolean isBusted() {
+		return (getValue() > 21);
 	}
 
-	public void setChannel(String channel) {
-		this.channel = channel;
-	}
-	
-
-	String hostname = "irc.oftc.net";
-	
-
-	public String getHostname() {
-		return hostname;
-	}
-
-	public void setHostname(String hostname) {
-		this.hostname = hostname;
+	public Card peek() {
+		return cards.get(0);
 	}
 
 	@Override
-	public void run() {
-		bot.setVerbose(true);
-		try {
-			bot.connect(hostname);
-			bot.joinChannel(channel);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+	public String toString() {
+		String s = cards.get(0).toString();
 
+		for (int i = 1; i < cards.size(); i++) {
+			s += ", " + cards.get(i).toString();
+		}
+		return s;
+	}
 }
+

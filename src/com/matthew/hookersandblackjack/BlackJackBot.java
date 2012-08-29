@@ -1,145 +1,38 @@
+/*
+ * BlackJackBot.java
+ *
+ * Copyright (C) 2012 Matthew Khouzam
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
 package com.matthew.hookersandblackjack;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Random;
 
 import org.jibble.pircbot.PircBot;
 
+import com.matthew.hookersandblackjack.blackjackutil.Card;
+import com.matthew.hookersandblackjack.blackjackutil.Deck;
+import com.matthew.hookersandblackjack.blackjackutil.Hand;
+import com.matthew.hookersandblackjack.blackjackutil.Player;
+import com.matthew.hookersandblackjack.blackjackutil.Player.status;
+
 public class BlackJackBot extends PircBot {
-	class Card implements Comparable<Card> {
-		final String suite;
-
-		final int number;;
-
-		final int id;
-		final int value;
-
-		public Card(int pos) {
-			id = pos;
-			number = pos % 13;
-			int su = pos % 4;
-			suite = suites[su];
-			if ((number + 1) > 10)
-				value = 10;
-			else if (number == 0)
-				value = 11;
-			else
-				value = number + 1;
-		}
-
-		@Override
-		public int compareTo(Card o) {
-			if (value < o.value)
-				return -1;
-			if (value > o.value)
-				return 1;
-			return 0;
-		}
-
-		@Override
-		public String toString() {
-			return numbers[number] + " of " + suite;
-		}
-	}
-
-	class Deck {
-		ArrayList<Card> cards = new ArrayList<Card>();
-
-		public Deck() {
-			for (int j = 0; j < 5; j++)
-				addDeck();
-		}
-
-		public void addDeck() {
-			for (int i = 0; i < 52; i++) {
-				cards.add(new Card(i));
-			}
-			Collections.shuffle(cards);
-		}
-
-		Card Deal() {
-			Card ret = cards.remove(cards.size() - 1);
-			if (remain() < 52 * 2) {
-				addDeck();
-			}
-			return ret;
-		}
-
-		public int remain() {
-			return cards.size();
-		}
-	}
-
-	class Hand {
-		ArrayList<Card> cards = new ArrayList<Card>();
-
-		public int getValue() {
-			int value = 0;
-			for (Card c : cards) {
-				if (value + 11 > 21 && c.value == 11)
-					value++;
-				else
-					value += c.value;
-
-			}
-			return value;
-		}
-
-		public void hit(Card c) {
-			cards.add(c);
-			Collections.sort(cards);
-
-		}
-
-		public boolean isBusted() {
-			return (getValue() > 21);
-		}
-
-		public Card peek() {
-			return cards.get(0);
-		}
-
-		@Override
-		public String toString() {
-			String s = cards.get(0).toString();
-
-			for (int i = 1; i < cards.size(); i++) {
-				s += ", " + cards.get(i).toString();
-			}
-			return s;
-		}
-	}
-
-	class Player {
-		public status stat;
-
-		public long bet;
-
-		public Hand dealerHand;
-		public Hand playerHand;
-
-		public Player() {
-			reset();
-		}
-
-		private void reset() {
-			stat = status.notStarted;
-			bet = 0;
-		}
-
-	};
-
-	enum status {
-		notStarted, started, bet, dealt, stand
-	}
-
-	final static String suites[] = { "Hearts", "Spades", "Clubs", "Diamonds" };
-
-	final static String numbers[] = { "Ace", "Two", "Three", "Four", "Five",
-			"Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King" };
-
+	
 	Deck d = new Deck();
 
 	HMDB playerDB;
@@ -149,7 +42,7 @@ public class BlackJackBot extends PircBot {
 	Random rnd = new Random(System.nanoTime());
 
 	public BlackJackBot() {
-		this.setName("BlackJackBot");
+		this.setName("BlackJackBot-TEST"+(System.nanoTime()%1000));
 	}
 
 	private void balance(String sender) {

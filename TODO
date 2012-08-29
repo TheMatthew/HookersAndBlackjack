@@ -1,8 +1,8 @@
-- Add GPL headers
+(Done) - Add GPL headers
 
-- Stabilize bank
+(Done) - Stabilize bank
 
-- Add crc on bank file. Human readable but we still need to work to hack it. 
+(Not needed) - Add crc on bank file. Human readable but we still need to work to hack it. 
 
 - Add !Help option for Hooker and Blackjack
 
