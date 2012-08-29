@@ -19,15 +19,17 @@
  */
 package com.matthew.hookersandblackjack.blackjackutil;
 
+import com.matthew.hookersandblackjack.bankUtil.Currency;
+
 public class Player {
 
 	public enum status {
-		notStarted, started, bet, dealt, stand
+		notStarted, started, bet, dealt, hit, stand
 	}
 
 	public status stat;
 
-	public long bet;
+	public Currency bet;
 
 	public Hand dealerHand;
 	public status getStat() {
@@ -50,7 +52,7 @@ public class Player {
 
 	public void reset() {
 		stat = status.notStarted;
-		bet = 0;
+		bet.setValue(0);
 	}
 
 };
