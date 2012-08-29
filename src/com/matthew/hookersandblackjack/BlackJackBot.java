@@ -148,6 +148,7 @@ public class BlackJackBot extends PircBot {
 						"Given a " + c + " total: "
 								+ player.playerHand.getValue());
 
+				player.stat = Player.status.hit;
 				if (player.playerHand.getValue() > 21) {
 					reply(sender, "Busted");
 					player.reset();
@@ -220,7 +221,7 @@ public class BlackJackBot extends PircBot {
 			if (canHitOrStand(player)) {
 				int dealerValue = player.dealerHand.getValue();
 				reply(sender, "Dealer has " + player.dealerHand);
-				while (dealerValue <= 17) {
+				while (dealerValue < 17) {
 					Card c = d.Deal();
 					reply(sender, "Dealer hits " + c);
 					player.dealerHand.hit(c);
