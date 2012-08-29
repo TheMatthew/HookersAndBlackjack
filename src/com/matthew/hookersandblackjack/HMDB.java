@@ -37,12 +37,13 @@ public class HMDB {
 	public HMDB(String fileName) throws IOException {
 		super();
 		dbFile = new File(fileName);
-		if (!dbFile.exists())
+		if (!dbFile.exists()) {
 			dbFile.createNewFile();
-		ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(
-				dbFile));
-		oos.writeObject(new HashMap<String, Long>());
-		oos.close();
+			ObjectOutputStream oos = new ObjectOutputStream(
+					new FileOutputStream(dbFile));
+			oos.writeObject(new HashMap<String, Long>());
+			oos.close();
+		}
 	}
 
 	/**
