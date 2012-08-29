@@ -139,8 +139,8 @@ public class BlackJackBot extends PircBot {
 
 	private void hit(String sender, Player player) {
 		{
-			if (canHitOrStand(player)) {
-				sendAction(sender, "/me hits " + sender);
+			if (!canHitOrStand(player)) {
+				sendAction(sender, "hits " + sender);
 			} else {
 				Card c = d.Deal();
 				player.playerHand.hit(c);
