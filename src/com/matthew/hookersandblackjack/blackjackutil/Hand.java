@@ -25,22 +25,33 @@ import java.util.Collections;
 public class Hand {
 	ArrayList<Card> cards = new ArrayList<Card>();
 
+	boolean soft;
+
+	public boolean isSoft() {
+		getValue();
+		return soft;
+	}
+
 	public int getValue() {
 		int value = 0;
+		boolean hasAce = false;
+		soft = false;
 		for (Card c : cards) {
-			if (value + 11 > 21 && c.value == 11)
+			if (c.value == 11) {
 				value++;
-			else
-				value += c.value;
-
+				hasAce = true;
+			}
+			value += c.value;
+		}
+		if (hasAce && value <= 11) {
+			value += 10;
+			soft = true;
 		}
 		return value;
 	}
 
 	public void hit(Card c) {
 		cards.add(c);
-		Collections.sort(cards);
-
 	}
 
 	public boolean isBusted() {
@@ -61,4 +72,3 @@ public class Hand {
 		return s;
 	}
 }
-
