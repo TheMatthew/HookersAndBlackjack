@@ -21,10 +21,14 @@ package com.matthew.hookersandblackjack.blackjackutil;
 
 import java.util.ArrayList;
 
+import com.matthew.hookersandblackjack.bankUtil.Currency;
+
 public class Hand {
 	ArrayList<Card> cards = new ArrayList<Card>();
 
 	boolean soft;
+	
+	public Currency pot ;
 
 	public boolean isSoft() {
 		getValue();
@@ -37,7 +41,7 @@ public class Hand {
 		soft = false;
 		for (Card c : cards) {
 			if (c.value == 11) {
-				value++;
+				value += 1;
 				hasAce = true;
 			} else {
 				value += c.value;
@@ -71,4 +75,30 @@ public class Hand {
 		}
 		return s;
 	}
+
+	public Hand split() {
+		Hand retHand = null;
+		if (this.cards.size() == 2
+				&& (cards.get(0).number == cards.get(1).number)) {
+			retHand = new Hand();
+			retHand.hit(this.cards.remove(1));
+		}
+		return retHand;
+	}
+
+	public long win(){
+		return pot.getValue();
+	}
+	
+	public Currency winBlackJack(){ 
+		float val = pot.getValue(); 
+		val *= 2.5;
+		long longVal = (long) Math.ceil(val); 
+		return new Currency(longVal);
+	}
+	
+	public Currency lose(){
+		return pot;
+	}
+	
 }

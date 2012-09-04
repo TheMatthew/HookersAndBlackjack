@@ -19,40 +19,153 @@
  */
 package com.matthew.hookersandblackjack.blackjackutil;
 
+import java.util.ArrayList;
+
+import com.matthew.hookersandblackjack.BlackJackBot;
+import com.matthew.hookersandblackjack.HMDB;
 import com.matthew.hookersandblackjack.bankUtil.Currency;
+import com.matthew.hookersandblackjack.blackjackutil.BlackjackGame.status;
 
 public class Player {
 
-	public enum status {
-		notStarted, started, bet, dealt, hit, stand
+	final String name;
+	Long money;
+	Currency masterBet = null;
+	HMDB playerDB;
+	
+	int currentHand;
+	ArrayList<Hand> hands;
+
+	public Player(String playerName, Long money) {
+		this.money = money;
+		name = playerName;
+		currentHand = 0;
+		stat = status.notplaying;
+		
 	}
 
-	public status stat;
+	public HMDB getPlayerDB() {
+		return playerDB;
+	}
 
-	public Currency bet;
+	public void setPlayerDB(HMDB playerDB) {
+		this.playerDB = playerDB;
+	}
 
-	public Hand dealerHand;
-	public status getStat() {
+	public BlackjackGame getGame() {
+		return game;
+	}
+
+	public void setGame(BlackjackGame game) {
+		this.game = game;
+	}
+
+	enum status {
+		playing, notplaying,waiting
+	};
+
+	private status stat = status.notplaying;
+
+	boolean persistBet = false;
+
+	public BlackjackGame game;
+
+	public status getStatus() {
 		return stat;
 	}
 
-	public Hand getDealerHand() {
-		return dealerHand;
-	}
-
-	public Hand getPlayerHand() {
-		return playerHand;
-	}
-
-	public Hand playerHand;
-
-	public Player() {
-		reset();
+	public void setStatus(status stat) {
+		this.stat = stat;
+		if (stat == status.notplaying) {
+			game.unregister(this);
+			game = null;
+		}
+		game.update();
 	}
 
 	public void reset() {
-		stat = status.notStarted;
-		bet= new Currency(0L);
+		setStatus(status.notplaying);
+		if (!persistBet) {
+
+		}
+	}
+
+	public void doubleDown() {
+		hit();
+		stand();
+
+	}
+
+	public void bet(Long val ){
+		masterBet = new Currency(val);
+	}
+	
+	public void deal(){
+		doBet();
+		hands.add( new Hand() );
+		hit();
+		hit();
+		game.deal();		
+	}
+
+	private void doBet() {
+		long value = masterBet.getValue();
+		getCurrentHand().pot = new Currency(value);
+		playerDB.put(name, playerDB.get(name) - value);
+	}
+	
+	public void hit() {
+		getCurrentHand().hit( BlackJackBot.getDeck().Deal());
+	}
+
+	private Hand getCurrentHand() {
+		return hands.get(currentHand);
+	}
+
+	public void stand() {
+		if(hasMoreHands())
+			currentHand++;
+			else
+				setStatus(status.waiting);
+	}
+	
+	public void split(){
+		if( canBet()){
+			hands.add(getCurrentHand().split());
+			doBet();
+		}
+	}
+
+	private boolean canBet() {
+		return playerDB.get(name) > masterBet.getValue();
+	}
+
+	private boolean hasMoreHands() {
+		return currentHand < hands.size();
+	}
+
+	public boolean isWaiting() {
+		return this.getStatus().equals(status.waiting);
+	}
+
+	public ArrayList<Hand> getHands() {
+		return hands;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void forfeit() {
+		for(Hand h : hands){
+			h.pot = new Currency( 0L );
+		}
+		setStatus(status.notplaying);
+		
+	}
+
+	public boolean hasBet() {
+		return this.stat.equals(status.notplaying);
 	}
 
 };

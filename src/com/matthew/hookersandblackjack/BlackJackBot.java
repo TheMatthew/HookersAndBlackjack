@@ -26,15 +26,19 @@ import java.util.Random;
 import org.jibble.pircbot.PircBot;
 
 import com.matthew.hookersandblackjack.bankUtil.Currency;
+import com.matthew.hookersandblackjack.blackjackutil.BlackjackGame.status;
 import com.matthew.hookersandblackjack.blackjackutil.Card;
 import com.matthew.hookersandblackjack.blackjackutil.Deck;
 import com.matthew.hookersandblackjack.blackjackutil.Hand;
 import com.matthew.hookersandblackjack.blackjackutil.Player;
-import com.matthew.hookersandblackjack.blackjackutil.Player.status;
 
 public class BlackJackBot extends PircBot {
 
-	Deck d = new Deck();
+	static Deck d;
+
+	public static Deck getDeck() {
+		return d;
+	}
 
 	HMDB playerDB;
 
@@ -44,32 +48,57 @@ public class BlackJackBot extends PircBot {
 
 	public BlackJackBot() {
 		this.setName("BlackJackBot");
+		if (null == d)
+			d = new Deck();
 	}
 
 	private void mainGame(String sender, String message) {
 		Player player = playerMap.get(sender);
 		if (player == null) {
-			player = new Player();
+			player = new Player(sender, playerDB.get(sender));
 			playerMap.put(sender, player);
 		}
 
-		String msg = message.toLowerCase();
-		if (msg.startsWith("!play"))
+		String msg[] = message.toLowerCase().split(" ");
+
+		String firstMsg = msg[0];
+		if (firstMsg.startsWith("!play"))
 			playStart(sender, player);
-		else if (msg.startsWith("!bet"))
-			bet(sender, player, msg);
-		else if (msg.startsWith("!deal"))
+		else {
+			String arg = null;
+			if (msg.length >= 2){
+				arg = msg[1];
+			}
+			if (firstMsg.startsWith("!bet"))
+				bet(sender, player, arg);
+			else if (firstMsg.startsWith("!deal")) {
+				if (msg.length > 1) {
+					Player host = playerMap.get(arg);
+					join(sender, host, player);
+				} else {
+					deal(sender, player);
+				}
+			} else if (firstMsg.startsWith("!hit"))
+				hit(sender, player);
+			else if (firstMsg.startsWith("!stand"))
+				stand(sender, player);
+			else if (firstMsg.startsWith("!balance"))
+				balance(sender);
+			else if (firstMsg.startsWith("!double"))
+				doubleDown(sender, player);
+			else if (firstMsg.startsWith("!help"))
+				help(sender);
+		}
+	}
+
+	private void join(String sender, Player host, Player player) {
+		if (host == null) {
+			reply(sender, "Invalid game, starting your own");
 			deal(sender, player);
-		else if (msg.startsWith("!hit"))
-			hit(sender, player);
-		else if (msg.startsWith("!stand"))
-			stand(sender, player);
-		else if (msg.startsWith("!balance"))
-			balance(sender);
-		else if (msg.startsWith("!double"))
-			doubleDown(sender, player);
-		else if (msg.startsWith("!help"))
-			help(sender);
+		} else {
+			host.game.register(player);
+		}
+
 	}
 
 	private void balance(String sender) {
@@ -82,17 +111,13 @@ public class BlackJackBot extends PircBot {
 	private void bet(String sender, Player player, String msg) {
 		{
 			Long money = playerDB.get(sender);
-			Long bet = Long.decode(msg.split(" ")[1]);
-
-			if (player.stat.equals(status.notStarted)
-					|| player.stat.equals(status.started)) {
-				if (money <= 0)
+			Long bet = Long.parseLong(msg);
+			if (player.hasBet()) {
+				if (bet <= 0)
 					reply(sender, "please bet a positive integer");
 				else if (bet <= money) {
-					playerDB.put(sender, money - bet);
-					player.bet = new Currency(bet);
-					player.stat = status.bet;
-					reply(sender, "You've just bet "+player.bet.toString());
+					player.bet(bet);
+					reply(sender, "You've just bet " + player.bet.toString());
 				} else {
 					reply(sender, "You don't have that kind of money");
 				}
@@ -101,40 +126,11 @@ public class BlackJackBot extends PircBot {
 	}
 
 	private void deal(String sender, Player player) {
-		if (!player.stat.equals(status.bet)) {
+		if (!player.canDeal()) {
 			reply(sender, "You are either playing or didn't bet yet.");
 		} else {
-
-			player.dealerHand = new Hand();
-			player.playerHand = new Hand();
-			Hand dealerHand = player.dealerHand;
-			Hand playerHand = player.playerHand;
-			dealerHand.hit(d.Deal());
-			dealerHand.hit(d.Deal());
-			playerHand.hit(d.Deal());
-			playerHand.hit(d.Deal());
-			if (dealerHand.getValue() == 21) {
-				if (playerHand.getValue() == 21) {
-					reply(sender, "It's a blackjack push!");
-					playerDB.put(sender,
-							player.bet.getValue() + playerDB.get(sender));
-				} else {
-					reply(sender, "Dealer has blackjack!");
-					player.reset();
-				}
-			} else if (playerHand.getValue() == 21) {
-				reply(sender, "Player has blackjack!");
-				playerDB.put(
-						sender,
-						(playerDB.get(sender) + (long) (player.bet.getValue() * 2.5)));
-				player.reset();
-
-			} else {
-				reply(sender, "Dealer has " + dealerHand.peek().toString());
-				reply(sender, "You have " + playerHand.toString());
-				player.stat = status.dealt;
-			}
-		}
+			player.deal();
+					}
 	}
 
 	private void hit(String sender, Player player) {
@@ -148,7 +144,7 @@ public class BlackJackBot extends PircBot {
 						"Given a " + c + " total: "
 								+ player.playerHand.getValue());
 
-				player.stat = Player.status.hit;
+				player.setStatus(Player.status.hit);
 				if (player.playerHand.getValue() > 21) {
 					reply(sender, "Busted");
 					player.reset();
@@ -172,7 +168,7 @@ public class BlackJackBot extends PircBot {
 	}
 
 	private void doubleDown(String sender, final Player player) {
-		if (player.stat.equals(Player.status.dealt)) {
+		if (player.getStatus().equals(Player.status.dealt)) {
 			long val = player.bet.getValue();
 			player.bet = new Currency(val * 2);
 			Long cash = playerDB.get(sender);
@@ -184,19 +180,18 @@ public class BlackJackBot extends PircBot {
 	}
 
 	private void help(String sender) {
-		sendMessage(sender, "Type " + 
-				(char) 2 + "!help" + (char) 2 + " to display this message, " + 
-				(char) 2 + "!play" + (char) 2 + " to play, " + 
-				(char) 2 + "!bet <amount>" + (char) 2 + " to bet, " + 
-				(char) 2 + "!deal" + (char) 2 + " to deal, " +
-				(char) 2 + "!double" + (char) 2 + " to double down, " +
-				(char) 2 + "!stand" + (char) 2 + " to stand and " + 
-				(char) 2 + "!balance" + (char) 2 + " to know how much cash you have");
+		sendMessage(sender, "Type " + (char) 2 + "!help" + (char) 2
+				+ " to display this message, " + (char) 2 + "!play" + (char) 2
+				+ " to play, " + (char) 2 + "!bet <amount>" + (char) 2
+				+ " to bet, " + (char) 2 + "!deal" + (char) 2 + " to deal, "
+				+ (char) 2 + "!double" + (char) 2 + " to double down, "
+				+ (char) 2 + "!stand" + (char) 2 + " to stand and " + (char) 2
+				+ "!balance" + (char) 2 + " to know how much cash you have");
 	}
 
 	private void playStart(String sender, final Player player) {
 		{
-			if (player.stat.equals(status.notStarted)) {
+			if (player.getStatus().equals(status.notStarted)) {
 				this.reply(sender,
 						"Blackjack will start, place a bet (!bet <Amount>)");
 				Long money = playerDB.get(sender);
@@ -204,7 +199,7 @@ public class BlackJackBot extends PircBot {
 					money = 50L;
 					playerDB.put(sender, money);
 				}
-				player.stat = status.started;
+				player.setStatus(status.started);
 				balance(sender);
 			} else {
 				this.reply(sender, "You're already playing a game.");
@@ -218,6 +213,7 @@ public class BlackJackBot extends PircBot {
 
 	private void stand(String sender, Player player) {
 		{
+			player.stand();
 			if (canHitOrStand(player)) {
 				int dealerValue = player.dealerHand.getValue();
 				reply(sender, "Dealer has " + player.dealerHand);
@@ -254,9 +250,16 @@ public class BlackJackBot extends PircBot {
 		}
 	}
 
+	@Override
+	protected void onPart(String channel, String sender, String login,
+			String hostname) {
+		super.onPart(channel, sender, login, hostname);
+		playerMap.get(login).forfeit();
+	}
+
 	private boolean canHitOrStand(Player player) {
-		return player.stat.equals(status.dealt)
-				|| player.stat.equals(status.hit);
+		return player.getStatus().equals(status.dealt)
+				|| player.getStatus().equals(status.hit);
 	}
 
 	public void reply(String sender, String message) {
