@@ -94,6 +94,11 @@ public class HMDB {
 		return ret;
 	}
 
+	synchronized public void add(String key, Long val){
+		Long cur = get(key);
+		put(key, cur+val);
+	}
+	
 	/**
 	 * 
 	 * @param key
