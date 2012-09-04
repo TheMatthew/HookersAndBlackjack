@@ -30,6 +30,8 @@ import java.io.IOException;
  */
 public class Main {
 
+	private static final String CHANNEL = "#dorsal-fun";
+
 	/**
 	 * @param args
 	 * @throws InterruptedException
@@ -37,14 +39,17 @@ public class Main {
 	public static void main(String[] args) throws InterruptedException {
 		HookerBot localhb;
 		BlackJackBot localbb;
+		ScrambleBot localsb; 
 		HMDB playerDB = null;
+		IrcRunnable scrambleRunnable = new IrcRunnable();
 		IrcRunnable hookerRunnable = new IrcRunnable();
 		IrcRunnable blackjackRunnable = new IrcRunnable();
+		Thread scrambleThread = new Thread(scrambleRunnable);
 		Thread hookerThread = new Thread(hookerRunnable);
 		Thread blackjackThread = new Thread(blackjackRunnable);
 		localhb = new HookerBot();
 		localbb = new BlackJackBot();
-
+		
 		try {
 			playerDB = new HMDB("bank");
 
@@ -53,20 +58,26 @@ public class Main {
 			e.printStackTrace();
 			return;
 		}
+		localsb = new ScrambleBot(playerDB);
 		localbb.setPlayerDB(playerDB);
 		localhb.setPlayerDB(playerDB);
 		hookerRunnable.setBot(localhb);
-		hookerRunnable.setChannel("#dorsal-fun");
-		blackjackRunnable.setChannel("#dorsal-fun");
+		scrambleRunnable.setBot(localsb);
+		scrambleRunnable.setChannel(CHANNEL);
+		hookerRunnable.setChannel(CHANNEL);
+		blackjackRunnable.setChannel(CHANNEL);
 		blackjackRunnable.setBot(localbb);
 		blackjackThread.start();
 		while (!localbb.isConnected())
 			Thread.sleep(1000);
 		hookerThread.start();
+		while (!localhb.isConnected())
+			Thread.sleep(1000);
+		scrambleThread.start();
 		blackjackThread.setName("BlackJack");
 		hookerThread.setName("Hooker");
 		blackjackThread.join();
 		hookerThread.join();
-
+		scrambleThread.join();
 	}
 }

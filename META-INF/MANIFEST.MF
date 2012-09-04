@@ -4,6 +4,6 @@ Export-Package: com.matthew.hookersandblackjack,
  org.jibble.pircbot
 Bundle-Name: Hookers and BlackJack
 Bundle-Vendor: none
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: lib/pircbot.jar
 Bundle-ManifestVersion: 2
