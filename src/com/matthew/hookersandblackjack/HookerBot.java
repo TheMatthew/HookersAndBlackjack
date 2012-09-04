@@ -39,7 +39,7 @@ public class HookerBot extends PircBot {
 	class LastAction {
 		public LastAction(String action) {
 			name = action;
-			cost = ((name.hashCode() % 80)+80)%80 + 20;
+			cost = ((name.hashCode() % 80) + 80) % 80 + 20;
 		}
 
 		public int getPrice() {
@@ -107,26 +107,27 @@ public class HookerBot extends PircBot {
 	private void hotness(String channel, String sender) {
 		Set<String> keys = playerDB.Keys();
 		ArrayList<Pair> al = new ArrayList<Pair>();
-		for( String s : keys){
+		for (String s : keys) {
 			Pair p = new Pair();
-			p.key = s; 
+			p.key = s;
 			p.val = playerDB.get(s);
 			al.add(p);
 		}
 		Collections.sort(al);
 		String players = "I find ";
 		final int arrSize = Math.min(10, al.size());
-		for(int i= 0 ; i < arrSize; i++){
-		players += (char)2;
-		players += al.get(i).key;
-		players += (char)2;
-		if( i < arrSize-2)
-		players += ", ";
-		else if( i == arrSize-2)
-			players += " and ";
+		for (int i = 0; i < arrSize; i++) {
+			players += (char) 2;
+			players += al.get(i).key;
+			players += (char) 2;
+			if (i < arrSize - 2)
+				players += ", ";
+			else if (i == arrSize - 2)
+				players += " and ";
 		}
-		players+= " hot.";
-		sendMessage( channel, sender+ ": " + players);}
+		players += " hot.";
+		sendMessage(channel, sender + ": " + players);
+	}
 
 	private void accept(String channel, String sender) {
 		{
@@ -137,7 +138,7 @@ public class HookerBot extends PircBot {
 					sendMessage(channel, sender + ": Ok");
 					sendAction(channel, " does " + lastAction.name + " to "
 							+ sender);
-					playerDB.put(sender, currentCash - lastAction.getPrice());
+					playerDB.add(sender, (long) -lastAction.getPrice());
 				} else {
 					sendMessage(channel, "Hey everyone, " + sender
 							+ " can't even afford a " + lastAction.name + "!");

@@ -34,7 +34,7 @@ public class ScrambleBot extends PircBot {
 									+ " answered "
 									+ currentWord
 									+ " which is correct and will now receive 10 LTTng dollars! ");
-					playerDB.put(sender, playerDB.get(sender) + 10L);
+					playerDB.add(sender, 10L);
 				}
 			} else {
 				sendMessage(channel, sender + " disabled the game");

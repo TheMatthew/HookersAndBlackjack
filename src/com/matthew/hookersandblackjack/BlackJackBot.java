@@ -89,10 +89,10 @@ public class BlackJackBot extends PircBot {
 				if (money <= 0)
 					reply(sender, "please bet a positive integer");
 				else if (bet <= money) {
-					playerDB.put(sender, money - bet);
+					playerDB.add(sender, -bet);
 					player.bet = new Currency(bet);
 					player.stat = status.bet;
-					reply(sender, "You've just bet "+player.bet.toString());
+					reply(sender, "You've just bet " + player.bet.toString());
 				} else {
 					reply(sender, "You don't have that kind of money");
 				}
@@ -116,17 +116,14 @@ public class BlackJackBot extends PircBot {
 			if (dealerHand.getValue() == 21) {
 				if (playerHand.getValue() == 21) {
 					reply(sender, "It's a blackjack push!");
-					playerDB.put(sender,
-							player.bet.getValue() + playerDB.get(sender));
+					playerDB.add(sender, playerDB.get(sender));
 				} else {
 					reply(sender, "Dealer has blackjack!");
 					player.reset();
 				}
 			} else if (playerHand.getValue() == 21) {
 				reply(sender, "Player has blackjack!");
-				playerDB.put(
-						sender,
-						(playerDB.get(sender) + (long) (player.bet.getValue() * 2.5)));
+				playerDB.add(sender, ((long) (player.bet.getValue() * 2.5)));
 				player.reset();
 
 			} else {
@@ -177,21 +174,20 @@ public class BlackJackBot extends PircBot {
 			player.bet = new Currency(val * 2);
 			Long cash = playerDB.get(sender);
 			cash -= val;
-			playerDB.put(sender, cash - val);
+			playerDB.add(sender, -val);
 			this.hit(sender, player);
 			this.stand(sender, player);
 		}
 	}
 
 	private void help(String sender) {
-		sendMessage(sender, "Type " + 
-				(char) 2 + "!help" + (char) 2 + " to display this message, " + 
-				(char) 2 + "!play" + (char) 2 + " to play, " + 
-				(char) 2 + "!bet <amount>" + (char) 2 + " to bet, " + 
-				(char) 2 + "!deal" + (char) 2 + " to deal, " +
-				(char) 2 + "!double" + (char) 2 + " to double down, " +
-				(char) 2 + "!stand" + (char) 2 + " to stand and " + 
-				(char) 2 + "!balance" + (char) 2 + " to know how much cash you have");
+		sendMessage(sender, "Type " + (char) 2 + "!help" + (char) 2
+				+ " to display this message, " + (char) 2 + "!play" + (char) 2
+				+ " to play, " + (char) 2 + "!bet <amount>" + (char) 2
+				+ " to bet, " + (char) 2 + "!deal" + (char) 2 + " to deal, "
+				+ (char) 2 + "!double" + (char) 2 + " to double down, "
+				+ (char) 2 + "!stand" + (char) 2 + " to stand and " + (char) 2
+				+ "!balance" + (char) 2 + " to know how much cash you have");
 	}
 
 	private void playStart(String sender, final Player player) {
@@ -227,24 +223,20 @@ public class BlackJackBot extends PircBot {
 					player.dealerHand.hit(c);
 					dealerValue = player.dealerHand.getValue();
 				}
-				Long money = playerDB.get(sender);
 				int playerValue = player.playerHand.getValue();
 				if (dealerValue > 21) {
-					money += 2 * player.bet.getValue();
 					reply(sender, "Dealer is bust! " + sender + " has won "
 							+ player.bet.toString());
-					playerDB.put(sender, money);
+					playerDB.add(sender, 2 * player.bet.getValue());
 					player.reset();
 				} else if (dealerValue < playerValue) {
-					money += 2 * player.bet.getValue();
 					reply(sender, "Dealer is bust! " + sender + " has won "
 							+ player.bet.toString());
-					playerDB.put(sender, money);
+					playerDB.add(sender, 2 * player.bet.getValue());
 					player.reset();
 				} else if (dealerValue == playerValue) {
-					money += player.bet.getValue();
 					reply(sender, "It's a push");
-					playerDB.put(sender, money);
+					playerDB.add(sender, player.bet.getValue());
 					player.reset();
 				} else {
 					reply(sender, "Dealer wins");
