@@ -48,7 +48,8 @@ public class ScrambleBot extends PircBot {
 		scrambledWord = null;
 		currentQuestion = null;
 		currentPlayer = null;
-		announcer.cancel();
+		if (announcer != null)
+			announcer.cancel();
 		announcer = null;
 	}
 
